@@ -203,9 +203,9 @@ def main():
         list_formats(info) 
             
     except yt_dlp.utils.DownloadError as e:
-        print(f"\n❌ خطای yt-dlp: {e}")
+        print(f"\n❌ خطای دانلود کننده")
     except Exception as e:
-        print(f"\n❌ خطای ناشناخته: {e}")
+        print(f"\n❌ خطای ناشناخته")
 
 if __name__ == '__main__':
     main()
