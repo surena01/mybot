@@ -116,7 +116,7 @@ async def handle(message):
             await processing_message.edit_text(error_message)
         else:
             await message.reply(error_message)
-        print(f"Error: {e}")
+        print(f"Error")
 
 if __name__ == "__main__":
     bot_thread = threading.Thread(target=run_bot)
