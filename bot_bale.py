@@ -2,6 +2,8 @@ import re
 import io
 from contextlib import redirect_stdout
 import urllib.parse
+from flask import Flask
+import threading
 
 from balethon import Client
 import youtube_tools
@@ -10,6 +12,13 @@ import os
 TOKEN = os.getenv("BOT_TOKEN")
 bot = Client(TOKEN)
 
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return "ربات تلگرام فعال است."
+
+
 YOUTUBE_URL_REGEX = re.compile(
     r"(https?://)?(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w-]+"
 )
@@ -17,6 +26,9 @@ YOUTUBE_URL_REGEX = re.compile(
 ANSI_LINK_RE = re.compile(
     r'\x1b\]8;;(?P<url>.*?)\x07(?P<text>.*?)\x1b\]8;;\x07'
 )
+
+def run_bot():
+    bot.run()
 
 def parse_sections(raw: str):
    
@@ -107,4 +119,8 @@ async def handle(message):
         print(f"Error: {e}")
 
 if __name__ == "__main__":
-    bot.run()
+    bot_thread = threading.Thread(target=run_bot)
+    bot_thread.daemon = True
+    bot_thread.start()
+    app.run(host='0.0.0.0', port=8000)
+
