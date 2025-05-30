@@ -1,16 +1,11 @@
 import re
 import io
 from contextlib import redirect_stdout
-import urllib.parse # این ماژول دیگر به طور خاص برای زیرنویس لازم نیست، اما ممکن است در آینده برای سایر URLها مفید باشد.
+import urllib.parse
 
 from balethon import Client
 import youtube_tools
 import os
-# ——————————————————————————————————————————
-# تنظیمات اولیه
-# ——————————————————————————————————————————
-
-
 
 TOKEN = os.getenv("BOT_TOKEN")
 bot = Client(TOKEN)
