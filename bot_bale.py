@@ -5,12 +5,14 @@ import urllib.parse # این ماژول دیگر به طور خاص برای ز�
 
 from balethon import Client
 import youtube_tools
-
+import os
 # ——————————————————————————————————————————
 # تنظیمات اولیه
 # ——————————————————————————————————————————
 
-TOKEN = "2089829151:JyZo1Tq9Jlaze75vx3QTFLyVDxNqi7lf9cjFRIDb" # لطفا توکن ربات خود را قرار دهید
+
+
+TOKEN = os.getenv("BOT_TOKEN")
 bot = Client(TOKEN)
 
 YOUTUBE_URL_REGEX = re.compile(
@@ -22,22 +24,18 @@ ANSI_LINK_RE = re.compile(
 )
 
 def parse_sections(raw: str):
-    # این تابع می‌تواند بدون تغییر باقی بماند.
-    # اگر "📜 زیرنویس‌ها:" در خروجی youtube_tools.list_formats باشد، این تابع آن را جدا می‌کند،
-    # اما چون در لیست order نیست، پردازش نخواهد شد.
+   
     parts = re.split(r'(?m)^(🎥 فقط ویدیو:|🔊 فقط صدا:|📜 زیرنویس‌ها:)$', raw)
     sections = {}
     for i in range(1, len(parts), 2):
         sections[parts[i].strip()] = parts[i+1].strip()
     return sections
-
-# تابع extract_buttons ساده شده و دیگر پارامتر is_subs ندارد
+    
 def extract_buttons(section_text: str):
     buttons = []
     for m in ANSI_LINK_RE.finditer(section_text):
         text = m.group('text')
         url  = m.group('url')
-        # منطق خاص مربوط به is_subs و تغییر URL برای VTT حذف شده است
         buttons.append([{"text": text, "url": url}])
     return buttons
 
@@ -54,7 +52,6 @@ async def handle(message):
         if not info:
             return await processing_message.edit_text("❌ اطلاعات ویدیوی معتبر یافت نشد.")
 
-        # — هدر ویدیو —
         title   = info.get("title","N/A")
         channel = info.get("channel") or info.get("uploader","N/A")
         dur_str = info.get("duration_string") or ""
@@ -74,7 +71,6 @@ async def handle(message):
         )
         await processing_message.edit_text(header)
 
-        # — تولید خروجی list_formats —
         buf = io.StringIO()
         with redirect_stdout(buf):
             youtube_tools.list_formats(info)
@@ -85,7 +81,6 @@ async def handle(message):
             return
 
         sections = parse_sections(raw)
-        # "📜 زیرنویس‌ها:" از لیست order حذف شده است
         order = ["🎥 فقط ویدیو:", "🔊 فقط صدا:"]
 
         any_button_sent = False
@@ -93,9 +88,6 @@ async def handle(message):
             body = sections.get(section_title, "")
             if not body:
                 continue
-            
-            # متغیر is_subs و منطق مربوط به آن حذف شده است
-            # تابع extract_buttons دیگر پارامتر is_subs را نمی‌پذیرد
             buttons = extract_buttons(body)
             
             if not buttons:
@@ -108,7 +100,6 @@ async def handle(message):
             )
             any_button_sent = True
         
-        # پیام به‌روز شده برای زمانی که هیچ دکمه‌ای (ویدیو/صدا) ارسال نشده است
         if not any_button_sent:
              await message.reply("هیچ لینک دانلودی (ویدیو/صدا) برای این ویدیو یافت نشد.")
 
