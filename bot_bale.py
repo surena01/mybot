@@ -111,7 +111,7 @@ async def handle(message):
              await message.reply("هیچ لینک دانلودی (ویدیو/صدا) برای این ویدیو یافت نشد.")
 
     except Exception as e:
-        error_message = f"❌ خطا در پردازش ویدیو: {e}"
+        error_message = f"❌ خطا در پردازش ویدیو"
         if processing_message:
             await processing_message.edit_text(error_message)
         else:
